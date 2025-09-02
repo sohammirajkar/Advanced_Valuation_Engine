@@ -1,0 +1,50 @@
+services:
+  # FastAPI Backend
+  - type: web
+    name: valuation-api
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: valuation-redis
+          property: connectionString
+      - key: PYTHONPATH
+        value: /app
+
+  # Streamlit Frontend  
+  - type: web
+    name: valuation-frontend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: API_BASE_URL
+        fromService:
+          type: web
+          name: valuation-api
+          property: host
+      - key: PYTHONPATH
+        value: /app
+
+  # Celery Worker
+  - type: worker
+    name: valuation-worker
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: celery -A app.worker.celery_app worker --loglevel=info
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: valuation-redis
+          property: connectionString
+      - key: PYTHONPATH
+        value: /app
+
+databases:
+  - name: valuation-redis
+    databaseName: valuation_engine
+    user: valuation_user
