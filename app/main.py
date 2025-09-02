@@ -9,11 +9,3 @@ app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
 @app.get("/")
 def root():
     return {"message": "Valuation Engine API Running"}
-
-@app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "service": "valuation-engine-api",
-        "version": "1.0.0"
-    }
