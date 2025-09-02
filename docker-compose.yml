@@ -1,0 +1,92 @@
+services:
+  # Redis service
+  redis:
+    image: redis:7-alpine
+    container_name: valuation-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # FastAPI Backend
+  api:
+    build: .
+    container_name: valuation-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Celery Worker
+  celery-worker:
+    build: .
+    container_name: valuation-celery
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A app.worker.celery_app worker --loglevel=info
+    volumes:
+      - .:/app
+
+  # Streamlit Frontend
+  frontend:
+    build: .
+    container_name: valuation-frontend
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://api:8000
+      - PYTHONPATH=/app
+    depends_on:
+      - api
+    command: streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port 8501
+    volumes:
+      - .:/app
+
+  # Celery Flower (Optional monitoring)
+  flower:
+    build: .
+    container_name: valuation-flower
+    restart: unless-stopped
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A app.worker.celery_app flower --port=5555
+    volumes:
+      - .:/app
+
+volumes:
+  redis_data:
+
+networks:
+  default:
+    name: valuation-network
