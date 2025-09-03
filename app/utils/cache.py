@@ -7,6 +7,7 @@ import redis
 import json
 import hashlib
 import pickle
+import os
 from typing import Any, Optional, Dict, Union, cast
 from functools import wraps
 import time
@@ -16,9 +17,19 @@ from datetime import datetime, timedelta
 class RedisCache:
     """Redis-based caching system for valuation computations"""
     
-    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 1):
+    def __init__(self, redis_url: Optional[str] = None):
         """Initialize Redis connection for caching"""
-        self.redis_client: redis.Redis = redis.Redis(host=host, port=port, db=db, decode_responses=False)
+        if redis_url:
+            self.redis_client: redis.Redis = redis.from_url(redis_url, decode_responses=False)
+        else:
+            # Fallback to environment variable or localhost
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/1")
+            if redis_url.startswith("redis://"):
+                self.redis_client = redis.from_url(redis_url, decode_responses=False)
+            else:
+                # Legacy format for localhost
+                self.redis_client = redis.Redis(host="localhost", port=6379, db=1, decode_responses=False)
+        
         self.default_ttl = 3600  # 1 hour default TTL
         
     def _generate_cache_key(self, prefix: str, params: Dict[str, Any]) -> str:

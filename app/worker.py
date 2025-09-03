@@ -3,6 +3,7 @@ from celery import Celery
 import numpy as np
 from numba import jit
 import time
+import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Any, Optional
 from app.models.valuation_models import (
@@ -10,10 +11,13 @@ from app.models.valuation_models import (
 )
 from app.utils.cache import cached_computation, cache
 
+# Get Redis URL from environment variable, fallback to localhost for development
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
 celery_app = Celery(
     "valuation_worker",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
+    broker=REDIS_URL,
+    backend=REDIS_URL
 )
 
 @celery_app.task(name="monte_carlo_task")
