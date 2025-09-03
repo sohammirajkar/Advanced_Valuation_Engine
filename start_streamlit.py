@@ -18,6 +18,12 @@ def main():
     print(f"PORT: {port}")
     print(f"API_URL: {api_url}")
     print("")
+    print("⚠️  IMPORTANT: Make sure API_URL points to your deployed backend!")
+    print(f"   Current API_URL: {api_url}")
+    if api_url == 'http://localhost:8000':
+        print("⚠️  WARNING: Using localhost - this won't work in production!")
+        print("   Set API_URL environment variable to your Railway backend URL")
+    print("")
     
     # Validate port is numeric
     try:

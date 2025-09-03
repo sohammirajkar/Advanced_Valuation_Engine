@@ -41,15 +41,42 @@ st.title("📊 Advanced Valuation Engine")
 st.markdown("*Powered by FastAPI, Celery, and Redis for high-performance financial computations*")
 
 # API Connection Status
+api_connected = False
 try:
     response = requests.get(f"{API_URL}/", timeout=5)
     if response.status_code == 200:
         st.success(f"✅ Connected to API: {API_URL}")
+        api_connected = True
     else:
         st.error(f"❌ API Connection Failed: {API_URL} (Status: {response.status_code})")
 except requests.exceptions.RequestException as e:
     st.error(f"❌ Cannot connect to API: {API_URL} - {str(e)}")
-    st.info("💡 If running locally, make sure your FastAPI backend is running on the configured URL")
+    
+    # Show helpful troubleshooting info
+    with st.expander("🔧 Troubleshooting", expanded=True):
+        st.markdown("""
+        **Possible solutions:**
+        
+        1. **For Railway Deployment**: Make sure to set the `API_URL` environment variable in Railway:
+           - Go to your Railway project dashboard
+           - Navigate to Variables tab
+           - Add: `API_URL` = `https://your-backend-service.up.railway.app`
+           - **Important**: Use your actual backend URL without trailing slash
+        
+        2. **For Local Development**: Make sure your FastAPI backend is running:
+           ```bash
+           uvicorn app.main:app --reload --port 8000
+           ```
+        
+        3. **Check Backend Status**: Verify your backend is accessible at the configured URL
+        
+        **Current Configuration:**
+        - API_URL: `{API_URL}`
+        - Expected Backend: FastAPI service with Celery workers
+        """)
+        
+        if st.button("🔄 Retry Connection"):
+            st.rerun()
 
 # Sidebar for global settings
 with st.sidebar:
@@ -57,18 +84,25 @@ with st.sidebar:
     risk_free_rate = st.number_input("Risk-free Rate (%)", value=5.0, min_value=0.0, max_value=20.0, step=0.1) / 100
     
     st.header("Cache Management")
-    if st.button("Check Cache Stats"):
-        try:
-            cache_stats = requests.get(f"{API_URL}/tasks/cache-stats").json()
-            st.json(cache_stats)
-        except Exception as e:
-            st.error(f"Error fetching cache stats: {e}")
+    if st.button("Check Cache Stats", disabled=not api_connected):
+        if api_connected:
+            try:
+                cache_stats = requests.get(f"{API_URL}/tasks/cache-stats").json()
+                st.json(cache_stats)
+            except Exception as e:
+                st.error(f"Error fetching cache stats: {e}")
+        else:
+            st.error("API connection required to check cache stats")
 
 # Create tabs for different functionalities
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "Basic Valuation", "Options Pricing", "Exotic Options", 
     "Bond Analytics", "Portfolio Analysis", "Market Data"
 ])
+
+# Show warning if API is not connected
+if not api_connected:
+    st.warning("⚠️ **API Connection Required**: Connect to your backend to use valuation features. See troubleshooting section above.")
 
 # Tab 1: Basic Valuation
 with tab1:
