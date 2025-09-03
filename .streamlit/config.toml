@@ -1,0 +1,14 @@
+[global]
+dataFrameSerialization = "legacy"
+
+[server]
+port = 8501
+headless = true
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+serverAddress = "0.0.0.0"
+
+[theme]
+base = "light"

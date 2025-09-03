@@ -40,6 +40,17 @@ st.markdown("""
 st.title("📊 Advanced Valuation Engine")
 st.markdown("*Powered by FastAPI, Celery, and Redis for high-performance financial computations*")
 
+# API Connection Status
+try:
+    response = requests.get(f"{API_URL}/", timeout=5)
+    if response.status_code == 200:
+        st.success(f"✅ Connected to API: {API_URL}")
+    else:
+        st.error(f"❌ API Connection Failed: {API_URL} (Status: {response.status_code})")
+except requests.exceptions.RequestException as e:
+    st.error(f"❌ Cannot connect to API: {API_URL} - {str(e)}")
+    st.info("💡 If running locally, make sure your FastAPI backend is running on the configured URL")
+
 # Sidebar for global settings
 with st.sidebar:
     st.header("Global Settings")
