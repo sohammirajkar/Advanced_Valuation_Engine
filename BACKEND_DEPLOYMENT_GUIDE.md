@@ -3,6 +3,7 @@
 ## Overview
 
 Your valuation engine backend consists of three services that need to be deployed:
+
 1. **Redis** - Message broker and cache
 2. **FastAPI Backend** - Main API server
 3. **Celery Worker** - Background task processor
@@ -11,7 +12,7 @@ Your valuation engine backend consists of three services that need to be deploye
 
 ### Step 1: Deploy Redis Service
 
-1. **Go to Railway**: https://railway.app
+1. **Go to Railway**: <https://railway.app>
 2. **Create New Project** or use existing one
 3. **Add Redis Service**:
    - Click "New Service"
@@ -35,9 +36,11 @@ Your valuation engine backend consists of three services that need to be deploye
    - **Start Command**: `python start_backend.py`
 
 3. **Set Environment Variables**:
+
    ```
    REDIS_URL=redis://default:password@host:port
    ```
+
    (Use the URL from Step 1)
 
 4. **Deploy**:
@@ -57,9 +60,11 @@ Your valuation engine backend consists of three services that need to be deploye
    - **Start Command**: `python start_worker.py`
 
 3. **Set Environment Variables**:
+
    ```
    REDIS_URL=redis://default:password@host:port
    ```
+
    (Same URL from Step 1)
 
 4. **Deploy**:
@@ -70,9 +75,11 @@ Your valuation engine backend consists of three services that need to be deploye
 
 1. **Go to Your Frontend Service**
 2. **Update Environment Variables**:
+
    ```
    API_URL=https://your-backend-service-url.up.railway.app
    ```
+
    (Use the URL from Step 2, WITHOUT trailing slash)
 
 3. **Redeploy Frontend**:
@@ -81,39 +88,47 @@ Your valuation engine backend consists of three services that need to be deploye
 ## ✅ Verification Steps
 
 ### 1. Check Redis Service
+
 - Go to Redis service logs
 - Should show successful startup
 
 ### 2. Check Backend Service  
+
 - Go to backend service logs
 - Should show: `Uvicorn running on http://0.0.0.0:8000`
 - Visit the backend URL in browser - should show: `{"message":"Valuation Engine API Running"}`
 
 ### 3. Check Worker Service
+
 - Go to worker service logs  
 - Should show: `celery@hostname ready`
 - Should see Redis connection successful
 
 ### 4. Check Frontend
+
 - Visit your frontend URL
-- Should show: ✅ "Connected to API: https://your-backend-url"
+- Should show: ✅ "Connected to API: <https://your-backend-url>"
 - Try running a valuation to test end-to-end functionality
 
 ## 🔧 Troubleshooting
 
 ### Backend shows "Connection refused" to Redis
+
 - **Issue**: `REDIS_URL` is incorrect or Redis service is down
 - **Solution**: Check Redis service URL and status
 
 ### Worker shows "Cannot connect to broker"
+
 - **Issue**: Same as above, worker can't reach Redis
 - **Solution**: Verify `REDIS_URL` is set correctly in worker service
 
 ### Frontend shows "Cannot connect to API"
+
 - **Issue**: `API_URL` is incorrect or backend is down
 - **Solution**: Check backend service status and URL
 
 ### Backend shows "Module not found" errors
+
 - **Issue**: Dependencies not installed properly
 - **Solution**: Check that `requirements.txt` includes all dependencies
 
