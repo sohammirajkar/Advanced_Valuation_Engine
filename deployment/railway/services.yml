@@ -1,0 +1,39 @@
+# Railway Deployment Configuration
+#
+# This file defines the Railway service configurations for the valuation engine.
+# Each service uses the same Dockerfile but different start commands.
+
+# Frontend Service Configuration
+frontend:
+  build:
+    builder: DOCKERFILE
+    dockerfilePath: Dockerfile
+  deploy:
+    startCommand: python deployment/scripts/start_frontend.py
+    healthcheckPath: /
+    restartPolicyType: ON_FAILURE
+
+# Backend API Service Configuration
+backend:
+  build:
+    builder: DOCKERFILE
+    dockerfilePath: Dockerfile
+  deploy:
+    startCommand: python deployment/scripts/start_backend.py
+    healthcheckPath: /
+    restartPolicyType: ON_FAILURE
+
+# Celery Worker Service Configuration
+worker:
+  build:
+    builder: DOCKERFILE
+    dockerfilePath: Dockerfile
+  deploy:
+    startCommand: python deployment/scripts/start_worker.py
+    restartPolicyType: ON_FAILURE
+
+# Redis Service (Database)
+redis:
+  image: redis:7-alpine
+  variables:
+    REDIS_URL: ${{Redis.REDIS_URL}}

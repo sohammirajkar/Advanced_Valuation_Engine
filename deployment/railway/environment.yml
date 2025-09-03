@@ -1,0 +1,21 @@
+# Environment Variables Configuration for Railway Deployment
+#
+# Copy the appropriate variables to each service in Railway dashboard
+
+# Frontend Service Environment Variables
+frontend_env:
+  API_URL: "https://your-backend-service.up.railway.app" # Set after backend deployment
+  PORT: "${PORT}" # Railway sets this automatically
+
+# Backend Service Environment Variables
+backend_env:
+  REDIS_URL: "${Redis.REDIS_URL}" # Railway Redis connection string
+  PORT: "${PORT}" # Railway sets this automatically
+
+# Worker Service Environment Variables
+worker_env:
+  REDIS_URL: "${Redis.REDIS_URL}" # Same Redis connection as backend
+
+# Redis Service (No additional env vars needed)
+redis_env:
+  # Redis runs with default configuration

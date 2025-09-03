@@ -37,7 +37,7 @@
 
 ## 🏗️ Architecture
 
-```mermaid
+```
 graph TB
     A[Streamlit Frontend] --> B[FastAPI Backend]
     B --> C[Celery Workers]
@@ -399,3 +399,153 @@ For questions and support:
 ---
 
 ⭐ **Star this repository if you find it useful!**
+
+```
+# 📊 Advanced Valuation Engine
+
+A comprehensive financial valuation platform built with FastAPI, Streamlit, and Celery for high-performance quantitative finance computations.
+
+## ✨ Features
+
+- **Real-time Valuation**: Black-Scholes, Binomial Trees, Monte Carlo simulations
+- **Interactive Frontend**: Streamlit-powered UI with advanced visualizations  
+- **Async Processing**: Celery workers for long-running computations
+- **Production Ready**: Docker containerized with Railway deployment
+
+## 🚀 Quick Deploy to Railway
+
+**New to deployment?** Follow our 5-step quick start:
+
+👉 **[Quick Start Guide](deployment/QUICKSTART.md)**
+
+**Need full details?** See the complete deployment guide:
+
+👉 **[Full Deployment Guide](deployment/README.md)**
+
+## 🏗️ Architecture
+
+```
+Frontend (Streamlit) → Backend (FastAPI) → Worker (Celery) → Redis
+```
+
+## 📁 Project Structure
+
+```
+valuation_engine/
+├── app/                    # Backend API
+│   ├── models/            # Valuation models
+│   ├── routers/           # API endpoints
+│   ├── utils/             # Utilities & cache
+│   └── worker.py          # Celery configuration
+├── deployment/            # 🚀 Deployment configs
+│   ├── scripts/           # Startup scripts
+│   ├── railway/           # Railway configs
+│   └── configs/           # Generated configs
+├── streamlit_app.py       # Frontend application
+├── Dockerfile            # Container config
+└── requirements.txt      # Dependencies
+```
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Python 3.8+
+- Redis server
+
+### Setup
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start Redis (separate terminal)
+redis-server
+
+# Start FastAPI backend (separate terminal)
+uvicorn app.main:app --reload --port 8000
+
+# Start Celery worker (separate terminal)  
+celery -A app.worker.celery_app worker --loglevel=info
+
+# Start frontend (separate terminal)
+streamlit run streamlit_app.py
+```
+
+## 🌐 Production Deployment
+
+This application is optimized for **Railway** deployment with:
+
+- **Automatic scaling** and **zero-downtime deployments**
+- **Managed Redis** service
+- **Professional logging** and **health checks**
+- **Environment-based configuration**
+
+See deployment guides for step-by-step instructions.
+
+## 📊 Valuation Models
+
+### Implemented Models
+- **Black-Scholes**: European options with Greeks
+- **Binomial Trees**: American/European options  
+- **Monte Carlo**: Path-dependent simulations
+- **Exotic Options**: Asian, Barrier, Lookback
+- **Bond Pricing**: YTM and price calculations
+
+### Performance Features
+- **Redis caching** for faster repeated calculations
+- **Numba JIT compilation** for Monte Carlo optimization
+- **Vectorized operations** with NumPy
+- **Async task processing** with Celery
+
+## 📈 Usage Examples
+
+### Basic NPV Calculation
+```python
+# Via API
+POST /valuation/npv
+{
+  "cash_flows": [100, 200, 300, 400],
+  "discount_rate": 0.10
+}
+```
+
+### Options Pricing
+```python
+# Black-Scholes
+POST /valuation/black-scholes
+{
+  "S": 100, "K": 100, "T": 1.0,
+  "r": 0.05, "sigma": 0.2,
+  "option_type": "call"
+}
+```
+
+### Monte Carlo Simulation
+```python
+# Async Monte Carlo
+POST /tasks/montecarlo?trials=10000&S0=100&K=100&T=1.0
+```
+
+## 🧪 Testing
+
+```bash
+# Run tests
+python test_enhanced_features.py
+
+# Test deployment status
+python deployment/scripts/deploy_helper.py status
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Add tests for new features
+4. Submit pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Ready to deploy?** 🚀 Start with the [Quick Start Guide](deployment/QUICKSTART.md)
